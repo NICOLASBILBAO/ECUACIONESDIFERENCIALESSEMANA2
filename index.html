@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecuaciones diferenciales · Unidad 1 · Actividad 2 · Ingeniería en Seguridad y Salud en el Trabajo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0b2340;
+    --bg-deep:#081a30;
+    --grid-line:rgba(148,197,255,.14);
+    --grid-line-strong:rgba(148,197,255,.28);
+    --yellow:#ffc72c;
+    --yellow-dark:#caa020;
+    --yellow-light:#ffd968;
+    --paper:#edf1e6;
+    --ink:#0b2340;
+    --cyan:#8ecbff;
+    --red:#ff6b4a;
+    --green:#5ac98f;
+    --muted:#9db6d8;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0/40px 40px,
+      radial-gradient(circle at 15% 10%, var(--bg) 0%, var(--bg-deep) 70%);
+    background-color:var(--bg);
+    color:var(--paper);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding:24px 24px 120px;
+  }
+  h1,h2,h3,.mono{font-family:'JetBrains Mono',monospace;}
+  ::selection{background:var(--yellow);color:var(--ink);}
+
+  /* ---------- header ---------- */
+  .topbar{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    border-bottom:2px solid var(--grid-line-strong);
+    padding-bottom:14px;margin-bottom:28px;flex-wrap:wrap;gap:10px;
+  }
+  .topbar .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;color:var(--yellow);text-transform:uppercase;}
+  .topbar h1{font-size:20px;margin:4px 0 0;color:var(--paper);letter-spacing:.01em;}
+  .topbar .sub{font-size:12px;color:var(--muted);margin-top:2px;}
+  .badge{
+    font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink);
+    background:var(--yellow);padding:5px 10px;border-radius:2px;font-weight:700;
+    letter-spacing:.04em;white-space:nowrap;
+  }
+
+  .stage{max-width:920px;margin:0 auto;}
+  .screen{display:none;animation:fadeUp .5s ease;}
+  .screen.active{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+  .panel{
+    background:rgba(237,241,230,.04);
+    border:1px solid var(--grid-line-strong);
+    border-radius:4px;
+    padding:28px 30px;
+    position:relative;
+  }
+  .panel::before{
+    content:'';position:absolute;top:0;left:0;width:22px;height:22px;
+    border-top:2px solid var(--yellow);border-left:2px solid var(--yellow);
+  }
+  .panel::after{
+    content:'';position:absolute;bottom:0;right:0;width:22px;height:22px;
+    border-bottom:2px solid var(--yellow);border-right:2px solid var(--yellow);
+  }
+
+  label{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--cyan);text-transform:uppercase;margin-bottom:8px;}
+  input[type=text]{
+    width:100%;padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:16px;
+    background:var(--paper);color:var(--ink);border:none;border-radius:2px;outline:none;
+    border:2px solid transparent;
+  }
+  input[type=text]:focus{border-color:var(--yellow);}
+
+  button{
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;letter-spacing:.04em;
+    cursor:pointer;border:none;border-radius:2px;padding:13px 22px;transition:transform .12s ease, filter .12s ease;
+  }
+  button:active{transform:translateY(1px) scale(.98);}
+  button:focus-visible{outline:3px solid var(--cyan);outline-offset:2px;}
+  .btn-primary{background:var(--yellow);color:var(--ink);}
+  .btn-primary:hover{filter:brightness(1.08);}
+  .btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-ghost{background:transparent;color:var(--paper);border:1px solid var(--grid-line-strong);}
+  .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
+  .btn-audio{
+    background:transparent;border:1px solid var(--yellow-dark);color:var(--yellow);
+    font-size:12px;padding:9px 14px;display:inline-flex;align-items:center;gap:6px;
+  }
+  .btn-audio:hover{background:rgba(255,199,44,.1);}
+  .btn-audio.alt{border-color:var(--cyan);color:var(--cyan);}
+  .btn-audio.alt:hover{background:rgba(142,203,255,.1);}
+
+  /* ---------- teclado de potencias ---------- */
+  .exp-toolbar{
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0 4px;
+  }
+  .exp-toolbar .exp-label{
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);
+    letter-spacing:.06em;text-transform:uppercase;margin-right:2px;
+  }
+  .btn-chip{
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;
+    background:rgba(142,203,255,.08);color:var(--cyan);
+    border:1px solid rgba(142,203,255,.35);border-radius:20px;
+    padding:6px 13px;cursor:pointer;transition:background .12s ease,transform .12s ease;
+  }
+  .btn-chip:hover{background:rgba(142,203,255,.18);}
+  .btn-chip:active{transform:scale(.95);}
+  .input-hint{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.5;}
+
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:18px;}
+
+  /* ---------- welcome ---------- */
+  .welcome-hero{text-align:center;padding:10px 0 6px;}
+  .welcome-hero h2{font-size:clamp(26px,4vw,38px);margin:0 0 6px;line-height:1.15;}
+  .welcome-hero .accent{color:var(--yellow);}
+  .welcome-hero p{color:var(--muted);max-width:560px;margin:0 auto 30px;font-size:15px;line-height:1.6;}
+
+  /* ---------- intro ---------- */
+  .chain{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;margin:26px 0 8px;}
+  .chain .op{font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:20px;}
+  .step-label{font-family:'JetBrains Mono',monospace;color:var(--cyan);font-size:13px;text-align:center;margin-top:6px;}
+
+  /* ---------- 3D crates ---------- */
+  .scene3d{perspective:700px;}
+  .crate3d{
+    position:relative;width:112px;height:70px;transform-style:preserve-3d;
+    transform:rotateX(-18deg) rotateY(-32deg);
+    animation:rock 5s ease-in-out infinite alternate;
+  }
+  @keyframes rock{
+    0%{transform:rotateX(-18deg) rotateY(-32deg);}
+    100%{transform:rotateX(-12deg) rotateY(-8deg);}
+  }
+  .crate3d.small{width:52px;height:40px;}
+  .crate3d .f{position:absolute;display:flex;align-items:center;justify-content:center;
+    font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--ink);border:1px solid rgba(11,35,64,.15);
+    text-align:center;line-height:1.15;padding:2px;white-space:normal;}
+  .crate3d .f-front{width:112px;height:70px;background:var(--yellow);transform:translateZ(30px);font-size:12.5px;}
+  .crate3d .f-back{width:112px;height:70px;background:var(--yellow-dark);transform:translateZ(-30px) rotateY(180deg);}
+  .crate3d .f-right{width:60px;height:70px;left:26px;background:var(--yellow-dark);transform:rotateY(90deg) translateZ(56px);}
+  .crate3d .f-left{width:60px;height:70px;left:26px;background:var(--yellow-dark);transform:rotateY(-90deg) translateZ(56px);}
+  .crate3d .f-top{width:112px;height:60px;top:5px;background:var(--yellow-light);transform:rotateX(90deg) translateZ(35px);}
+  .crate3d .f-bottom{width:112px;height:60px;top:5px;background:var(--yellow-dark);transform:rotateX(-90deg) translateZ(35px);}
+
+  .crate3d.small .f-front{width:52px;height:40px;transform:translateZ(17px);font-size:10px;}
+  .crate3d.small .f-back{width:52px;height:40px;transform:translateZ(-17px) rotateY(180deg);}
+  .crate3d.small .f-right{width:34px;height:40px;left:9px;transform:rotateY(90deg) translateZ(26px);}
+  .crate3d.small .f-left{width:34px;height:40px;left:9px;transform:rotateY(-90deg) translateZ(26px);}
+  .crate3d.small .f-top{width:52px;height:34px;top:3px;transform:rotateX(90deg) translateZ(20px);}
+  .crate3d.small .f-bottom{width:52px;height:34px;top:3px;transform:rotateX(-90deg) translateZ(20px);}
+
+  .crate3d.result .f-front,.crate3d.result .f-back{background:#33465e;color:var(--paper);}
+  .crate3d.result .f-right,.crate3d.result .f-left{background:#243448;}
+  .crate3d.result .f-top,.crate3d.result .f-bottom{background:#3c5372;}
+  .crate3d.result.revealed .f-front,.crate3d.result.revealed .f-back{background:var(--green);color:var(--ink);}
+  .crate3d.result.revealed .f-right,.crate3d.result.revealed .f-left{background:#3d8f66;}
+  .crate3d.result.revealed .f-top,.crate3d.result.revealed .f-bottom{background:#79dba4;}
+
+  .crate-pair{display:flex;align-items:center;justify-content:center;gap:22px;flex-wrap:wrap;margin:24px 0;padding:18px 0;}
+
+  /* ---------- exercise ---------- */
+  .progress-track{height:6px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;margin-bottom:22px;}
+  .progress-fill{height:100%;background:var(--yellow);transition:width .4s ease;}
+  .sheet-tag{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--yellow);letter-spacing:.12em;margin-bottom:6px;}
+  .context-text{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:16px;}
+  .statement-box{
+    background:var(--paper);color:var(--ink);font-family:'JetBrains Mono',monospace;
+    font-size:clamp(20px,3.4vw,28px);font-weight:700;padding:18px 22px;border-radius:3px;
+    display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px;
+  }
+  .feedback{margin-top:16px;padding:14px 16px;border-radius:3px;font-size:14px;line-height:1.6;display:none;}
+  .feedback.show{display:block;}
+  .feedback.ok{background:rgba(90,201,143,.12);border:1px solid var(--green);color:#c5f3da;}
+  .feedback.bad{background:rgba(255,107,74,.12);border:1px solid var(--red);color:#ffd2c4;}
+  .explanation{margin-top:14px;padding:16px;background:rgba(142,203,255,.06);border-left:3px solid var(--cyan);border-radius:2px;font-size:13.5px;line-height:1.65;color:#dbe9fb;display:none;}
+  .explanation.show{display:block;}
+
+  /* ---------- summary ---------- */
+  .summary-item{border-bottom:1px solid var(--grid-line);padding:14px 0;}
+  .summary-item:last-child{border-bottom:none;}
+  .summary-head{display:flex;justify-content:space-between;gap:12px;font-family:'JetBrains Mono',monospace;font-size:13px;}
+  .summary-head .mark{font-weight:800;}
+  .summary-head .mark.ok{color:var(--green);}
+  .summary-head .mark.bad{color:var(--red);}
+  .score-hero{text-align:center;padding:6px 0 22px;}
+  .score-hero .num{font-family:'JetBrains Mono',monospace;font-size:56px;font-weight:800;color:var(--yellow);}
+  .score-hero .lbl{color:var(--muted);font-size:13px;letter-spacing:.08em;text-transform:uppercase;}
+
+  /* ---------- title block (engineering drawing style) ---------- */
+  .titleblock{
+    position:fixed;bottom:0;left:0;right:0;
+    background:var(--bg-deep);border-top:2px solid var(--yellow);
+    display:flex;justify-content:center;gap:0;flex-wrap:wrap;
+    font-family:'JetBrains Mono',monospace;font-size:11px;z-index:20;
+  }
+  .titleblock .cell{padding:8px 18px;border-right:1px solid var(--grid-line-strong);color:var(--muted);}
+  .titleblock .cell b{display:block;color:var(--paper);font-size:12px;margin-top:2px;}
+  .titleblock .cell:last-child{border-right:none;}
+
+  @media(max-width:640px){
+    body{padding:16px 14px 130px;}
+    .panel{padding:20px 16px;}
+    .titleblock{font-size:10px;}
+    .titleblock .cell{padding:7px 10px;}
+  }
+  .cover{text-align:center;border-bottom:1px solid var(--grid-line-strong);padding-bottom:22px;margin-bottom:22px;}
+  .cover-uni{font-family:'JetBrains Mono',monospace;font-size:clamp(20px,3.6vw,30px);font-weight:800;color:var(--yellow);letter-spacing:.08em;}
+  .cover-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:18px;text-align:left;}
+  .cover-grid div{background:rgba(237,241,230,.05);border-left:3px solid var(--yellow);padding:10px 14px;}
+  .cover-grid span{display:block;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;color:var(--cyan);text-transform:uppercase;}
+  .cover-grid b{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--paper);}
+  .greet{display:none;margin-top:14px;padding:12px 16px;background:rgba(90,201,143,.12);border:1px solid var(--green);color:#c5f3da;font-family:'JetBrains Mono',monospace;font-size:14px;}
+  .greet.show{display:block;}
+  .audio-pair{display:inline-flex;gap:6px;flex-wrap:wrap;}
+  .guide{margin:18px 0 6px;border:1px solid var(--grid-line-strong);border-left:3px solid var(--cyan);background:rgba(142,203,255,.05);border-radius:3px;padding:12px 16px;}
+  .guide summary{cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--cyan);letter-spacing:.04em;font-weight:700;}
+  .guide ol{margin:10px 0;padding-left:22px;font-size:13.5px;line-height:1.65;color:#dbe9fb;}
+  .guide ol li span{display:block;color:var(--muted);font-size:12.5px;font-style:italic;}
+  .hint{margin-top:10px;padding:10px 14px;background:rgba(255,199,44,.09);border-left:3px solid var(--yellow);font-size:13.5px;line-height:1.6;color:#fff3cf;}
+  .hint i{display:block;color:var(--muted);font-size:12.5px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="eyebrow">Universidad Americana</div>
+    <h1>Ecuaciones diferenciales · Unidad 1 · Actividad 2</h1>
+    <div class="sub">Ingeniería en Seguridad y Salud en el Trabajo — Ecuaciones Diferenciales · Semana 2</div>
+  </div>
+  <div class="badge" id="statusBadge">LÁMINA 00/8</div>
+</div>
+
+<div class="stage">
+
+  <!-- ============ PANTALLA 0: BIENVENIDA ============ -->
+  <section id="screen-welcome" class="screen active">
+    <div class="panel">
+      <div class="cover">
+        <div class="cover-uni">UNIVERSIDAD AMERICANA</div>
+        <div class="cover-grid">
+          <div><span>Docente</span><b>NICOLAS BILBAO</b></div>
+          <div><span>Materia</span><b>ECUACIONES DIFERENCIALES</b></div>
+          <div><span>Semana</span><b>2</b></div>
+          <div><span>Programa</span><b>INGENIERÍA EN SEGURIDAD Y SALUD EN EL TRABAJO</b></div>
+        </div>
+      </div>
+      <div class="welcome-hero">
+        <h2>Modelando el <span class="accent">cambio</span>,<br>igual que en la ingeniería.</h2>
+        <p>Una <b>ecuación diferencial</b> describe cómo cambia una cantidad: la temperatura de un equipo, la concentración de un contaminante, la evolución de un riesgo. Resuelve 8 ejercicios con variables separables, ecuaciones lineales, exactas y sustitución de variables, con audio en español e inglés.</p>
+      </div>
+      <label for="studentName">Nombre completo del estudiante</label>
+      <input type="text" id="studentName" placeholder="Escribe tu nombre y apellido" autocomplete="off">
+      <div class="greet" id="greetBox"></div>
+      <div class="row">
+        <button class="btn-primary" id="startBtn">Comenzar actividad →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PANTALLA 1: INTRO / TEORÍA ============ -->
+  <section id="screen-intro" class="screen">
+    <div class="panel">
+      <div class="sheet-tag">CONCEPTO CLAVE</div>
+      <h2 style="margin:0 0 10px;font-size:22px;">¿Qué es una ecuación diferencial?</h2>
+      <p class="context-text" style="margin-bottom:10px;">Es una ecuación que relaciona una función con sus derivadas. <b>Resolverla</b> es encontrar la función que la cumple. Según su forma se usa un método: separar variables, factor integrante, verificar exactitud o hacer una sustitución. Una solución puede ser <b>general</b> (con constante C) o <b>particular</b> (si hay condición inicial).</p>
+      <span class="audio-pair"><button class="btn-audio" id="audioIntro">🔊 Escuchar (ES)</button><button class="btn-audio alt" id="audioIntroEN">🔊 Listen (EN)</button></span>
+
+      <div class="chain" id="factorTree"></div>
+
+      <div class="row" style="justify-content:flex-end;">
+        <button class="btn-primary" id="toExercises">Iniciar los 8 ejercicios →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PANTALLA 2: EJERCICIO (plantilla reutilizable) ============ -->
+  <section id="screen-exercise" class="screen">
+    <div class="panel">
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="sheet-tag" id="exTag">EJERCICIO 1 DE 8 · FACTOR COMÚN</div>
+      <p class="context-text" id="exContext"></p>
+
+      <div class="statement-box">
+        <span id="exStatement"></span>
+        <span class="audio-pair"><button class="btn-audio" id="audioStatement">🔊 Pregunta (ES)</button><button class="btn-audio alt" id="audioStatementEN">🔊 Question (EN)</button></span>
+      </div>
+
+      <div class="crate-pair scene3d" id="exCrates"></div>
+
+      <details class="guide" open>
+        <summary>📘 INSTRUCCIONES PARA DESARROLLAR EL EJERCICIO</summary>
+        <div id="guideMethod" class="sheet-tag" style="margin-top:10px;"></div>
+        <ol id="guideList"></ol>
+        <div class="row" style="margin-top:6px;">
+          <span class="audio-pair"><button class="btn-audio" id="guideAudio">🔊 Instrucciones (ES)</button><button class="btn-audio alt" id="guideAudioEN">🔊 Instructions (EN)</button></span>
+          <button type="button" class="btn-chip" id="hintBtn">💡 Ver pista (0/3)</button>
+          <span class="audio-pair"><button class="btn-audio" id="hintAudio">🔊 Pista (ES)</button><button class="btn-audio alt" id="hintAudioEN">🔊 Hint (EN)</button></span>
+        </div>
+        <div id="hintList"></div>
+      </details>
+
+      <label for="answerInput">Tu respuesta (solución de la ecuación)</label>
+
+      <div class="exp-toolbar">
+        <span class="exp-label">Insertar:</span>
+        <button type="button" class="btn-chip" data-insert="^">^</button>
+        <button type="button" class="btn-chip" data-insert="/">/</button>
+        <button type="button" class="btn-chip" data-insert="e^(">e^( )</button>
+        <button type="button" class="btn-chip" data-insert="sqrt(">√</button>
+        <button type="button" class="btn-chip" data-insert="ln(">ln</button>
+        <button type="button" class="btn-chip" data-insert="C">C</button>
+        <button type="button" class="btn-chip" data-insert=" = ">=</button>
+      </div>
+
+      <input type="text" id="answerInput" placeholder="Ej: y = x^3/4 + C/x" autocomplete="off">
+      <p class="input-hint">Usa <span class="mono">^</span> para potencias, <span class="mono">e^(...)</span> para la exponencial y <span class="mono">C</span> para la constante. Escribe la ecuación completa, ej. <span class="mono">y = x^3/4 + C/x</span> o <span class="mono">x^2+y^2=26</span>. No importa la forma algebraica: se comprueba que sea equivalente.</p>
+
+      <div class="row">
+        <button class="btn-primary" id="checkBtn">Comprobar respuesta</button>
+        <span class="audio-pair"><button class="btn-audio" id="audioMyAnswer">🔊 Mi respuesta (ES)</button><button class="btn-audio alt" id="audioMyAnswerEN">🔊 My answer (EN)</button></span>
+      </div>
+
+      <div class="row" id="postCheckAudios" style="display:none;">
+        <span class="audio-pair"><button class="btn-audio" id="audioExplain">🔊 Explicación (ES)</button><button class="btn-audio alt" id="audioExplainEN">🔊 Explanation (EN)</button></span>
+        <span class="audio-pair"><button class="btn-audio" id="audioCorrect">🔊 Respuesta correcta (ES)</button><button class="btn-audio alt" id="audioCorrectEN">🔊 Correct answer (EN)</button></span>
+      </div>
+
+      <div class="feedback" id="feedbackBox"></div>
+      <div class="explanation" id="explanationBox"></div>
+
+      <div class="row" style="justify-content:flex-end;">
+        <button class="btn-primary" id="nextBtn" style="display:none;">Siguiente ejercicio →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PANTALLA 3: RESUMEN + PDF ============ -->
+  <section id="screen-summary" class="screen">
+    <div class="panel">
+      <div class="sheet-tag">CIERRE DE ACTIVIDAD</div>
+      <div class="score-hero">
+        <div class="num" id="scoreNum">0/8</div>
+        <div class="lbl">ejercicios correctos</div>
+      </div>
+      <p class="input-hint" id="autoMsg" style="text-align:center;"></p>
+      <div id="summaryList"></div>
+      <div class="row" style="justify-content:center;margin-top:24px;">
+        <button class="btn-primary" id="pdfBtn">📄 Descargar PDF</button>
+        <button class="btn-primary" id="htmlBtn">🌐 Descargar HTML</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="titleblock">
+  <div class="cell">ESTUDIANTE<b id="tbName">—</b></div>
+  <div class="cell">DOCENTE<b>Nicolas Bilbao</b></div>
+  <div class="cell">MATERIA<b>Ecuaciones Diferenciales</b></div>
+  <div class="cell">SEMANA<b>2</b></div>
+  <div class="cell">PROGRAMA<b>Ing. SST</b></div>
+  <div class="cell">FECHA<b id="tbDate">—</b></div>
+</div>
+
+<script>
+/* ---------------------------------------------------------
+   DATOS DE LOS EJERCICIOS
+--------------------------------------------------------- */
+const X5=a=>a.map(x=>({x:x,t:x}));
+const exercises = [
+ {tag:"1a · VARIABLES SEPARABLES", context:"Resuelve la ecuación diferencial con condición inicial. Escribe la solución en forma implícita (por ejemplo x^2+y^2=...) o explícita.", enc:"Solve the differential equation with the initial condition. Write the solution in implicit form (for example x^2 + y^2 = ...) or explicit form.",
+  statement:"y′ = −x/y ,  y(5) = 1", display:"x² + y² = 26   (y = √(26 − x²))", steps:["Separar variables","Integrar ambos lados","Usar y(5)=1"],
+  explanation:"Escribimos y′ como dy sobre dx y separamos variables: y dy = −x dx. Integramos: y²/2 = −x²/2 + C, es decir x² + y² = K. Con y(5) = 1: 25 + 1 = 26. Por tanto x² + y² = 26 y, como y(5) = 1 es positivo, y es la raíz cuadrada de 26 − x².",
+  ene:"Write y′ as dy over dx and separate the variables: y dy = −x dx. Integrate: y²/2 = −x²/2 + C, that is x² + y² = K. With y(5) = 1: 25 + 1 = 26. Therefore x² + y² = 26 and, since y(5) = 1 is positive, y is the square root of 26 − x².",
+  sayES:"y prima igual a menos x sobre y, con y de 5 igual a 1", sayEN:"y prime equals minus x over y, with y of 5 equal to 1", solES:"x al cuadrado más y al cuadrado igual a 26", solEN:"x squared plus y squared equals 26",
+  chk:{type:'impl0', F:e=>e.x*e.x+e.y*e.y-26, pts:[[1,2],[3,-1],[-2,4],[.5,1.5],[4,3],[2,-2]], alt:{f:e=>Math.sqrt(26-e.x*e.x), xs:[-4,-2,0,1.5,3,4]}}},
+ {tag:"1b · VARIABLES SEPARABLES", context:"Q es una cantidad que tiende a 50 (por ejemplo, la temperatura de un equipo que se enfría hacia el ambiente). La condición del PDF se interpreta como Q(1) = 1. Escribe Q en función de t, con k constante.", enc:"Q is a quantity that approaches 50 (for example, the temperature of equipment cooling toward the environment). The initial condition is read as Q(1) = 1. Write Q as a function of t, with k constant.",
+  statement:"dQ/dt = k(Q − 50) ,  Q(1) = 1", display:"Q(t) = 50 − 49·e^(k(t−1))", steps:["Separar variables","Integrar: ln|Q−50| = kt + C","Usar Q(1)=1"],
+  explanation:"Separamos: dQ sobre (Q − 50) = k dt. Integramos: ln|Q − 50| = kt + C, luego Q − 50 = A e^(kt). Con Q(1) = 1: 1 − 50 = A e^k, así A = −49 e^(−k). Resultado: Q(t) = 50 − 49 e^(k(t−1)).",
+  ene:"Separate: dQ over (Q − 50) = k dt. Integrate: ln|Q − 50| = kt + C, so Q − 50 = A e^(kt). With Q(1) = 1: 1 − 50 = A e^k, so A = −49 e^(−k). Result: Q(t) = 50 − 49 e^(k(t−1)).",
+  sayES:"d Q sobre d t igual a k por paréntesis Q menos 50, con Q de 1 igual a 1", sayEN:"dQ over dt equals k times the quantity Q minus 50, with Q of 1 equal to 1", solES:"Q de t igual a 50 menos 49 por e elevado a k por t menos 1", solEN:"Q of t equals 50 minus 49 times e to the power of k times t minus 1",
+  chk:{type:'expl', f:e=>50-49*Math.exp(e.k*(e.t-1)), envs:[[1.5,.4],[2,.9],[1.2,1.1],[3,.5]].map(a=>({t:a[0],x:a[0],k:a[1]}))}},
+ {tag:"2a · LINEAL HOMOGÉNEA", context:"Resuelve la ecuación lineal homogénea. Incluye la constante C en tu respuesta.", enc:"Solve the linear homogeneous equation. Include the constant C in your answer.",
+  statement:"dy/dx − 5y = 0", display:"y = C·e^(5x)", steps:["Despejar dy/dx = 5y","Separar e integrar","Despejar y"],
+  explanation:"Despejamos: dy sobre dx = 5y, luego dy sobre y = 5 dx. Integramos: ln|y| = 5x + C1, así y = C e^(5x), con C = ±e^(C1).",
+  ene:"Solve for the derivative: dy over dx = 5y, so dy over y = 5 dx. Integrate: ln|y| = 5x + C1, so y = C e^(5x), with C = ±e^(C1).",
+  sayES:"d y sobre d x menos 5 y igual a 0", sayEN:"dy over dx minus 5 y equals 0", solES:"y igual a C por e elevado a 5 x", solEN:"y equals C times e to the power of 5 x",
+  chk:{type:'fam', xs:[.3,.7,1,1.4], a:x=>0, b:x=>Math.exp(5*x)}},
+ {tag:"2b · LINEAL (REDUCIBLE A DERIVADA EXACTA)", context:"Resuelve la ecuación lineal. Observa que el lado derecho 3x³ no es cero, así que no es estrictamente homogénea; se resuelve dividiendo entre 3. Incluye C.", enc:"Solve the linear equation. Note that the right side 3x³ is not zero, so it is not strictly homogeneous; divide by 3. Include C.",
+  statement:"3x·y′ + 3y = 3x³", display:"y = x³/4 + C/x", steps:["Dividir entre 3","Reconocer (xy)′","Integrar y despejar"],
+  explanation:"Dividimos entre 3: x y′ + y = x³. El lado izquierdo es la derivada de x por y, es decir (xy)′ = x³. Integramos: xy = x^4/4 + C. Despejamos: y = x³/4 + C/x.",
+  ene:"Divide by 3: x y′ + y = x³. The left side is the derivative of x times y, that is (xy)′ = x³. Integrate: xy = x^4/4 + C. Solve: y = x³/4 + C/x.",
+  sayES:"3 x y prima más 3 y igual a 3 x al cubo", sayEN:"3 x y prime plus 3 y equals 3 x cubed", solES:"y igual a x al cubo sobre 4 más C sobre x", solEN:"y equals x cubed over 4 plus C over x",
+  chk:{type:'fam', xs:[.5,1,1.7,2.5], a:x=>x*x*x/4, b:x=>1/x}},
+ {tag:"3a · ECUACIÓN EXACTA", context:"Verifica si es exacta (la derivada parcial de M respecto a y debe igualar la de N respecto a x). Si lo es, escribe la solución implícita F(x,y) = C.", enc:"Check whether it is exact (the partial derivative of M with respect to y must equal that of N with respect to x). If so, write the implicit solution F(x,y) = C.",
+  statement:"(2x − 1)dx + (3y + 7)dy = 0", display:"x² − x + (3/2)y² + 7y = C", steps:["Verificar My = Nx","Integrar M en x","Hallar h(y)"],
+  explanation:"M = 2x − 1 y N = 3y + 7. La derivada parcial de M respecto a y vale 0 y la de N respecto a x también vale 0, así que es exacta. Integramos M respecto a x: F = x² − x + h(y). Derivamos respecto a y: h′(y) = 3y + 7, luego h(y) = (3/2)y² + 7y. Solución: x² − x + (3/2)y² + 7y = C.",
+  ene:"M = 2x − 1 and N = 3y + 7. The partial derivative of M with respect to y is 0, and that of N with respect to x is also 0, so it is exact. Integrate M with respect to x: F = x² − x + h(y). Differentiate with respect to y: h′(y) = 3y + 7, so h(y) = (3/2)y² + 7y. Solution: x² − x + (3/2)y² + 7y = C.",
+  sayES:"paréntesis 2 x menos 1 d x más paréntesis 3 y más 7 d y igual a 0", sayEN:"the quantity 2x minus 1 dx plus the quantity 3y plus 7 dy equals 0", solES:"x al cuadrado menos x más 3 sobre 2 y al cuadrado más 7 y igual a C", solEN:"x squared minus x plus 3 over 2 y squared plus 7 y equals C",
+  chk:{type:'impl', F:e=>e.x*e.x-e.x+1.5*e.y*e.y+7*e.y, pts:[[0,0],[1,2],[2,-1],[-1,1],[3,1],[.5,-2]]}},
+ {tag:"3b · ECUACIÓN EXACTA", context:"Verifica si es exacta. Si lo es, escribe la solución implícita F(x,y) = C.", enc:"Check whether it is exact. If so, write the implicit solution F(x,y) = C.",
+  statement:"(3x²y + e^y)dx + (x³ + xe^y − 2y)dy = 0", display:"x³y + x·e^y − y² = C", steps:["Verificar My = Nx","Integrar M en x","Hallar h(y)"],
+  explanation:"M = 3x²y + e^y y N = x³ + x e^y − 2y. La derivada parcial de M respecto a y es 3x² + e^y y la de N respecto a x es 3x² + e^y: son iguales, así que es exacta. Integramos M respecto a x: F = x³y + x e^y + h(y). Derivamos respecto a y e igualamos a N: x³ + x e^y + h′(y) = x³ + x e^y − 2y, luego h′(y) = −2y y h(y) = −y². Solución: x³y + x e^y − y² = C.",
+  ene:"M = 3x²y + e^y and N = x³ + x e^y − 2y. The partial derivative of M with respect to y is 3x² + e^y, and that of N with respect to x is 3x² + e^y: they are equal, so it is exact. Integrate M with respect to x: F = x³y + x e^y + h(y). Differentiate with respect to y and set equal to N: x³ + x e^y + h′(y) = x³ + x e^y − 2y, so h′(y) = −2y and h(y) = −y². Solution: x³y + x e^y − y² = C.",
+  sayES:"paréntesis 3 x al cuadrado y más e elevado a y, d x, más paréntesis x al cubo más x e elevado a y menos 2 y, d y, igual a 0", sayEN:"the quantity 3 x squared y plus e to the y, dx, plus the quantity x cubed plus x e to the y minus 2 y, dy, equals 0", solES:"x al cubo y más x e elevado a y menos y al cuadrado igual a C", solEN:"x cubed y plus x e to the y minus y squared equals C",
+  chk:{type:'impl', F:e=>e.x*e.x*e.x*e.y+e.x*Math.exp(e.y)-e.y*e.y, pts:[[0,0],[1,.5],[2,-1],[-1,1],[.5,1.5],[1.5,-.5]]}},
+ {tag:"4a · SUSTITUCIÓN DE VARIABLES", context:"Usa la sustitución u = −x + 2y + 4 para convertir la ecuación en una lineal en u. Escribe y en función de x.", enc:"Use the substitution u = −x + 2y + 4 to turn the equation into a linear one in u. Write y as a function of x.",
+  statement:"dy/dx = −x + 2y + 4 ,  y(1) = 1", display:"y = x/2 − 7/4 + (9/4)·e^(2x−2)", steps:["Sustituir u = −x+2y+4","Resolver la EDO en u","Volver a y y usar y(1)=1"],
+  explanation:"Sea u = −x + 2y + 4. Entonces du/dx = −1 + 2·dy/dx = −1 + 2u. Resolvemos u′ − 2u = −1: u = C e^(2x) + 1/2. Volvemos a y: −x + 2y + 4 = C e^(2x) + 1/2, luego y = x/2 − 7/4 + (C/2) e^(2x). Con y(1) = 1: u(1) = 5, así 5 = C e² + 1/2 y C = (9/2) e^(−2). Resultado: y = x/2 − 7/4 + (9/4) e^(2x−2).",
+  ene:"Let u = −x + 2y + 4. Then du/dx = −1 + 2·dy/dx = −1 + 2u. Solve u′ − 2u = −1: u = C e^(2x) + 1/2. Back to y: −x + 2y + 4 = C e^(2x) + 1/2, so y = x/2 − 7/4 + (C/2) e^(2x). With y(1) = 1: u(1) = 5, so 5 = C e² + 1/2 and C = (9/2) e^(−2). Result: y = x/2 − 7/4 + (9/4) e^(2x−2).",
+  sayES:"d y sobre d x igual a menos x más 2 y más 4, con y de 1 igual a 1", sayEN:"dy over dx equals minus x plus 2 y plus 4, with y of 1 equal to 1", solES:"y igual a x sobre 2 menos 7 sobre 4 más 9 sobre 4 por e elevado a 2 x menos 2", solEN:"y equals x over 2 minus 7 over 4 plus 9 over 4 times e to the power of 2 x minus 2",
+  chk:{type:'expl', f:e=>e.x/2-1.75+2.25*Math.exp(2*e.x-2), envs:X5([.5,1,1.5,2,2.5])}},
+ {tag:"4b · SUSTITUCIÓN DE VARIABLES", context:"Usa la sustitución u = x + y + 1. Escribe y en función de x.", enc:"Use the substitution u = x + y + 1. Write y as a function of x.",
+  statement:"dy/dx = x + y + 1 ,  y(2) = 2", display:"y = 6·e^(x−2) − x − 2", steps:["Sustituir u = x+y+1","Resolver la EDO en u","Volver a y y usar y(2)=2"],
+  explanation:"Sea u = x + y + 1. Entonces du/dx = 1 + dy/dx = 1 + u. Resolvemos u′ − u = 1: u = C e^x − 1. Volvemos a y: y = C e^x − x − 2. Con y(2) = 2: C e² − 4 = 2, así C = 6 e^(−2). Resultado: y = 6 e^(x−2) − x − 2.",
+  ene:"Let u = x + y + 1. Then du/dx = 1 + dy/dx = 1 + u. Solve u′ − u = 1: u = C e^x − 1. Back to y: y = C e^x − x − 2. With y(2) = 2: C e² − 4 = 2, so C = 6 e^(−2). Result: y = 6 e^(x−2) − x − 2.",
+  sayES:"d y sobre d x igual a x más y más 1, con y de 2 igual a 2", sayEN:"dy over dx equals x plus y plus 1, with y of 2 equal to 2", solES:"y igual a 6 por e elevado a x menos 2, menos x menos 2", solEN:"y equals 6 times e to the power of x minus 2, minus x minus 2",
+  chk:{type:'expl', f:e=>6*Math.exp(e.x-2)-e.x-2, envs:X5([1,1.5,2,2.5,3])}}
+];
+
+const METHODS=['sep','sep','sep','lin','exa','exa','sub','sub'];
+const GUIDE={
+ sep:{name:"MÉTODO: VARIABLES SEPARABLES",
+  es:["Verifica que puedes escribir la ecuación como f(y) dy = g(x) dx.","Separa las variables: todo lo de y con dy a un lado y todo lo de x con dx al otro.","Integra ambos lados y agrega una sola constante C.","Si hay condición inicial, reemplaza los valores y despeja C; luego despeja la variable si es posible."],
+  en:["Check that you can write the equation as f(y) dy = g(x) dx.","Separate the variables: everything with y and dy on one side, everything with x and dx on the other.","Integrate both sides and add a single constant C.","If there is an initial condition, substitute the values and solve for C; then solve for the variable if possible."]},
+ lin:{name:"MÉTODO: ECUACIÓN LINEAL / FACTOR INTEGRANTE",
+  es:["Escribe la ecuación en la forma y′ + P(x)y = Q(x), dividiendo entre el coeficiente de y′.","Calcula el factor integrante μ = e^(integral de P dx), o reconoce directamente la derivada de un producto.","Multiplica por μ: el lado izquierdo queda (μy)′. Integra ambos lados.","Despeja y y no olvides la constante C."],
+  en:["Write the equation as y′ + P(x)y = Q(x), dividing by the coefficient of y′.","Compute the integrating factor μ = e^(integral of P dx), or directly recognize the derivative of a product.","Multiply by μ: the left side becomes (μy)′. Integrate both sides.","Solve for y and do not forget the constant C."]},
+ exa:{name:"MÉTODO: ECUACIÓN EXACTA",
+  es:["Escribe la ecuación como M dx + N dy = 0 e identifica M y N.","Calcula la derivada parcial de M respecto a y y la de N respecto a x. Si son iguales, es exacta.","Integra M respecto a x: F = integral de M dx + h(y).","Deriva F respecto a y, iguálala a N y despeja h′(y); intégrala para hallar h(y). La solución es F(x,y) = C."],
+  en:["Write the equation as M dx + N dy = 0 and identify M and N.","Compute the partial derivative of M with respect to y and that of N with respect to x. If they are equal, it is exact.","Integrate M with respect to x: F = integral of M dx + h(y).","Differentiate F with respect to y, set it equal to N and solve for h′(y); integrate to find h(y). The solution is F(x,y) = C."]},
+ sub:{name:"MÉTODO: SUSTITUCIÓN DE VARIABLES",
+  es:["Identifica la expresión lineal que aparece en el lado derecho y llámala u.","Deriva u respecto a x y reemplaza dy/dx para obtener una ecuación solo en u y x.","Resuelve la ecuación en u (es lineal o separable).","Regresa a la variable y y usa la condición inicial para hallar C."],
+  en:["Identify the linear expression on the right side and call it u.","Differentiate u with respect to x and replace dy/dx to get an equation only in u and x.","Solve the equation in u (it is linear or separable).","Go back to the variable y and use the initial condition to find C."]}
+};
+const HINTS=[
+ [["Escribe y′ como dy/dx y multiplica para que y quede junto a dy.","Queda y dy = −x dx. Integra ambos lados.","Obtienes x² + y² = K. Reemplaza x = 5, y = 1 para hallar K."],
+  ["Write y′ as dy/dx and multiply so that y ends up next to dy.","You get y dy = −x dx. Integrate both sides.","You get x² + y² = K. Substitute x = 5, y = 1 to find K."]],
+ [["Pasa (Q − 50) al lado de dQ y deja dt con k.","Integra dQ/(Q − 50) = k dt. Recuerda que la integral de 1/u es ln|u|.","Despeja Q − 50 = A e^(kt) y usa Q(1) = 1 para hallar A."],
+  ["Move (Q − 50) next to dQ and leave dt with k.","Integrate dQ/(Q − 50) = k dt. Remember the integral of 1/u is ln|u|.","Solve Q − 50 = A e^(kt) and use Q(1) = 1 to find A."]],
+ [["Despeja la derivada: dy/dx = 5y.","Separa: dy/y = 5 dx e integra ambos lados.","Aplica la exponencial a ln|y| = 5x + C1 para despejar y."],
+  ["Isolate the derivative: dy/dx = 5y.","Separate: dy/y = 5 dx and integrate both sides.","Apply the exponential to ln|y| = 5x + C1 to solve for y."]],
+ [["Divide toda la ecuación entre 3.","El lado izquierdo x y′ + y es la derivada del producto x·y.","Entonces (xy)′ = x³. Integra y luego divide entre x."],
+  ["Divide the whole equation by 3.","The left side x y′ + y is the derivative of the product x·y.","So (xy)′ = x³. Integrate and then divide by x."]],
+ [["Identifica M = 2x − 1 y N = 3y + 7.","Calcula la derivada parcial de M respecto a y y la de N respecto a x: ambas valen 0, luego es exacta.","Integra M respecto a x y suma h(y); deriva respecto a y e iguala a N."],
+  ["Identify M = 2x − 1 and N = 3y + 7.","Compute the partial derivative of M with respect to y and that of N with respect to x: both are 0, so it is exact.","Integrate M with respect to x and add h(y); differentiate with respect to y and set equal to N."]],
+ [["Identifica M = 3x²y + e^y y N = x³ + x e^y − 2y.","La derivada parcial de M respecto a y y la de N respecto a x dan ambas 3x² + e^y: es exacta.","Integra M respecto a x: x³y + x e^y + h(y). Deriva respecto a y, iguala a N y halla h(y)."],
+  ["Identify M = 3x²y + e^y and N = x³ + x e^y − 2y.","The partial derivative of M with respect to y and that of N with respect to x are both 3x² + e^y: it is exact.","Integrate M with respect to x: x³y + x e^y + h(y). Differentiate with respect to y, set equal to N and find h(y)."]],
+ [["Define u = −x + 2y + 4, la expresión del lado derecho.","Deriva: du/dx = −1 + 2 dy/dx y reemplaza dy/dx = u. Queda u′ = 2u − 1.","Resuelve u′ − 2u = −1 (lineal). Vuelve a y y usa y(1) = 1, es decir u(1) = 5."],
+  ["Define u = −x + 2y + 4, the expression on the right side.","Differentiate: du/dx = −1 + 2 dy/dx and replace dy/dx = u. You get u′ = 2u − 1.","Solve u′ − 2u = −1 (linear). Go back to y and use y(1) = 1, that is u(1) = 5."]],
+ [["Define u = x + y + 1.","Deriva: du/dx = 1 + dy/dx = 1 + u.","Resuelve u′ − u = 1, vuelve a y = u − x − 1 y usa y(2) = 2."],
+  ["Define u = x + y + 1.","Differentiate: du/dx = 1 + dy/dx = 1 + u.","Solve u′ − u = 1, go back to y = u − x − 1 and use y(2) = 2."]]
+];
+exercises.forEach((x,i)=>{ x.method=METHODS[i]; x.hints=HINTS[i][0]; x.hintsEN=HINTS[i][1]; });
+const EN = exercises.map(x => ({c:x.enc, e:x.ene}));
+const INTRO_ES='Una ecuación diferencial relaciona una función con sus derivadas. Resolverla es encontrar la función que la cumple. En seguridad y salud en el trabajo sirven para modelar el enfriamiento de equipos, la concentración de contaminantes o la evolución de un riesgo. En esta actividad resolverás ocho ejercicios con distintos métodos: variables separables, lineales, exactas y sustitución de variables.';
+const INTRO_EN='A differential equation relates a function to its derivatives. Solving it means finding the function that satisfies it. In occupational health and safety, they model equipment cooling, pollutant concentration or how a risk evolves. In this activity you will solve eight exercises using different methods: separable, linear, exact equations and substitution.';
+
+const state = { name: "", idx: 0, results: [] };
+let lastGreeted='';
+
+/* ---------------------------------------------------------
+   AUDIO (Web Speech API — sin archivos externos)
+--------------------------------------------------------- */
+function loadVoices(){ VOICES = ('speechSynthesis' in window) ? window.speechSynthesis.getVoices() : []; }
+let VOICES = []; loadVoices();
+function pickVoice(l){
+  const full = l.toLowerCase(), p = full.slice(0,2);
+  return VOICES.find(v => v.lang && v.lang.toLowerCase().replace('_','-') === full) ||
+         VOICES.find(v => v.lang && v.lang.toLowerCase().startsWith(p));
+}
+/* items: [[texto, 'es-ES' | 'en-US'], ...] — se leen en orden */
+function speakSeq(items){
+  if(!('speechSynthesis' in window)){ alert('Este navegador no soporta audio por voz. Prueba con Chrome o Edge.'); return; }
+  window.speechSynthesis.cancel();
+  items.forEach(([t,l]) => {
+    (t.match(/[^.!?:]+[.!?:]?/g) || [t]).forEach(chunk => {
+      if(!chunk.trim()) return;
+      const u = new SpeechSynthesisUtterance(chunk.trim());
+      u.lang = l; u.rate = 0.95;
+      const v = pickVoice(l); if(v) u.voice = v;
+      window.speechSynthesis.speak(u);
+    });
+  });
+}
+function speak(text, lang){ speakSeq([[text, lang || 'es-ES']]); }
+
+const LX = {
+  es:{sq:' al cuadrado ',cu:' al cubo ',pw:' elevado a la ',pw2:' elevado a ',op:' abre paréntesis ',cl:' cierra paréntesis ',pl:' más ',mi:' menos ',ti:' por ',eq:' igual a ',ov:' sobre ',sr:' raíz cuadrada de ',it:' integral de ',pr:' prima '},
+  en:{sq:' squared ',cu:' cubed ',pw:' to the power of ',pw2:' to the power of ',op:' open parenthesis ',cl:' close parenthesis ',pl:' plus ',mi:' minus ',ti:' times ',eq:' equals ',ov:' over ',sr:' square root of ',it:' integral of ',pr:' prime '}
+};
+/* Convierte símbolos matemáticos en palabras para que el audio los lea bien.
+   math=true: también lee paréntesis y guiones (respuestas del estudiante). */
+function toSpeech(raw, lang, math){
+  const d = LX[lang];
+  let s = (raw||'').replace(/²/g,'^2').replace(/³/g,'^3').replace(/\*\*/g,'^').replace(/−/g,d.mi);
+  s = s.replace(/\^2(?!\d)/g,d.sq).replace(/\^3(?!\d)/g,d.cu).replace(/\^(\d+)/g,d.pw+'$1').replace(/\^/g,d.pw2);
+  s = s.replace(/\+/g,d.pl).replace(/[×*]/g,d.ti).replace(/=/g,d.eq);
+  s = s.replace(/\//g,d.ov).replace(/sqrt/g,d.sr).replace(/[′']/g,d.pr);
+  if(math) s = s.replace(/-/g,d.mi).replace(/\(/g,d.op).replace(/\)/g,d.cl);
+  return s.replace(/\s+/g,' ').trim();
+}
+function greet(name){
+  if(!name || name === lastGreeted) return;
+  lastGreeted = name;
+  const g = document.getElementById('greetBox');
+  g.textContent = `Bienvenido Ingeniero ${name} · Welcome, Engineer ${name}`;
+  g.classList.add('show');
+  speakSeq([[`Bienvenido Ingeniero ${name}`,'es-ES'],[`Welcome, Engineer ${name}`,'en-US']]);
+}
+function esc(t){ return String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* Inserta texto en la posición del cursor de un input (para el teclado de potencias) */
+function insertAtCursor(input, text){
+  const start = input.selectionStart != null ? input.selectionStart : input.value.length;
+  const end = input.selectionEnd != null ? input.selectionEnd : input.value.length;
+  const val = input.value;
+  input.value = val.slice(0, start) + text + val.slice(end);
+  const pos = start + text.length;
+  input.focus();
+  input.setSelectionRange(pos, pos);
+}
+
+/* ---------------------------------------------------------
+   FIGURAS 3D (cajones CSS / crates)
+--------------------------------------------------------- */
+function crateHTML(label, opts){
+  opts = opts || {};
+  const cls = ['crate3d'];
+  if(opts.small) cls.push('small');
+  if(opts.result) cls.push('result');
+  if(opts.revealed) cls.push('revealed');
+  const caption = opts.caption ? `<div class="step-label">${opts.caption}</div>` : '';
+  return `
+    <div style="text-align:center;">
+      <div class="${cls.join(' ')}">
+        <div class="f f-front">${label}</div>
+        <div class="f f-back"></div>
+        <div class="f f-right"></div>
+        <div class="f f-left"></div>
+        <div class="f f-top"></div>
+        <div class="f f-bottom"></div>
+      </div>
+      ${caption}
+    </div>`;
+}
+
+/* IMPORTANTE: antes de comprobar la respuesta, los cubos NUNCA muestran los
+   factores reales (se ven como cajas cerradas con "?"). Solo se revelan
+   los factores una vez que el estudiante ya respondió el ejercicio. */
+function renderExerciseCrates(ex, revealed){
+  const wrap = document.getElementById('exCrates');
+  wrap.innerHTML = ex.steps.map((st,i) =>
+    (i ? `<span class="op">→</span>` : '') +
+    crateHTML(revealed ? st : '?', {result: !revealed, caption:'Paso ' + (i+1)})).join('') +
+    `<span class="op">⇒</span>` + crateHTML(revealed ? '✓' : '?', {result:true, revealed:revealed, caption: revealed ? 'Verificado' : 'Solución'});
+}
+
+function renderFactorTree(){
+  const items = ['EDO','Método','Integrar','Solución'];
+  document.getElementById('factorTree').innerHTML = items.map((t,i) =>
+    (i ? `<span class="op">→</span>` : '') + `<div>${crateHTML(t,{small:true,result:i===3,revealed:i===3})}</div>`).join('');
+}
+
+/* ---------------------------------------------------------
+   NAVEGACIÓN DE PANTALLAS
+--------------------------------------------------------- */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function updateBadge(){
+  const n = Math.min(state.idx, exercises.length);
+  document.getElementById('statusBadge').textContent =
+    state.idx >= exercises.length ? 'RESULTADOS' : `LÁMINA ${String(n+1).padStart(2,'0')}/${String(exercises.length).padStart(2,'0')}`;
+}
+
+/* ---------------------------------------------------------
+   VALIDACIÓN DE RESPUESTAS
+--------------------------------------------------------- */
+function normalize(s){
+  return s.toLowerCase()
+    .replace(/\s+/g,'')
+    .replace(/−/g,'-')
+    .replace(/\*\*/g,'^')
+    .replace(/[×∗]/g,'*')
+    .replace(/\*/g,'')
+    .replace(/²/g,'^2')
+    .replace(/³/g,'^3');
+}
+
+/* ---- Verificación numérica de respuestas (equivalencia algebraica) ---- */
+function prep(raw){
+  return raw.toLowerCase().replace(/\s+/g,'').replace(/[−–]/g,'-').replace(/[×·]/g,'*').replace(/²/g,'^2').replace(/³/g,'^3')
+    .replace(/√/g,'sqrt').replace(/[{[]/g,'(').replace(/[}\]]/g,')').replace(/_/g,'').replace(/,/g,'.').replace(/\*\*/g,'^');
+}
+function ev(s, env){
+  const T = s.match(/\d+\.?\d*|\.\d+|sqrt|ln|exp|pi|[a-z]|[-+*\/^()]/g) || [];
+  if(T.join('') !== s) throw new Error('tok');
+  const FN = {sqrt:Math.sqrt, ln:Math.log, exp:Math.exp};
+  let p = 0;
+  const peek = () => T[p];
+  const isStart = t => t !== undefined && /^(\d|\.|[a-z]|\()/.test(t);
+  function expr(){ let v = term(); while(peek()==='+'||peek()==='-'){ const o=T[p++]; const r=term(); v = o==='+' ? v+r : v-r; } return v; }
+  function term(){ let v = unary(); for(;;){ const t=peek();
+    if(t==='*'){ p++; v*=unary(); } else if(t==='/'){ p++; v/=unary(); } else if(isStart(t)){ v*=pow(); } else break; } return v; }
+  function unary(){ if(peek()==='-'){ p++; return -unary(); } if(peek()==='+'){ p++; return unary(); } return pow(); }
+  function pexp(){ if(peek()==='-'){ p++; return -pexp(); } return pow(); }
+  function pow(){ const b = atom(); if(peek()==='^'){ p++; return Math.pow(b, pexp()); } return b; }
+  function atom(){
+    const t = T[p++];
+    if(t === undefined) throw new Error('end');
+    if(/^(\d|\.)/.test(t)) return parseFloat(t);
+    if(t==='('){ const v=expr(); if(T[p++]!==')') throw new Error(')'); return v; }
+    if(FN[t]){ if(T[p++]!=='(') throw new Error('fn'); const v=expr(); if(T[p++]!==')') throw new Error(')'); return FN[t](v); }
+    if(t==='pi') return Math.PI;
+    if(t==='e') return Math.E;
+    if(Object.prototype.hasOwnProperty.call(env,t)) return env[t];
+    throw new Error('var '+t);
+  }
+  const v = expr();
+  if(p !== T.length) throw new Error('extra');
+  return v;
+}
+function near(a,b){ return Math.abs(a-b) <= 1e-6*(1+Math.abs(b)); }
+/* true / false, o null si la expresión no se puede interpretar */
+function isCorrect(ex, raw){
+  try{
+    let s = prep(raw).replace(/^(y|q)\([xt]\)=/,'y=');
+    let L = null, R = s;
+    const i = s.indexOf('=');
+    if(i >= 0){ if(s.indexOf('=',i+1) >= 0) return null; L = s.slice(0,i); R = s.slice(i+1); }
+    if(L !== null && (R==='y' || R==='q')){ const tmp=L; L=R; R=tmp; }
+    const explicit = (L===null || L==='y' || L==='q');
+    const c = ex.chk;
+    if(explicit){
+      if(c.type==='expl') return c.envs.every(e => near(ev(R,Object.assign({c:0},e)), c.f(e)));
+      if(c.type==='impl0') return c.alt.xs.every(x => near(ev(R,{x:x,t:x,c:0}), c.alt.f({x:x})));
+      if(c.type==='fam'){
+        const rows = c.xs.map(x => { const g = cc => ev(R,{x:x,t:x,c:cc,k:cc}); const a=g(0), b=g(1)-a; return {x:x, a:a, b:b, aff:near(g(2)-g(1), b)}; });
+        const r0 = rows[0].b / c.b(rows[0].x);
+        return Math.abs(r0) > 1e-9 && rows.every(r => r.aff && near(r.a, c.a(r.x)) && near(r.b / c.b(r.x), r0));
+      }
+      ev(R,{x:1,y:1,t:1,c:0,k:0}); // solo para detectar errores de sintaxis
+      return false;
+    }
+    if(c.type==='impl' || c.type==='impl0'){
+      const P = c.pts.map(p => ({x:p[0], y:p[1], t:p[0], c:0, k:0}));
+      const h = P.map(e => ev(L,e) - ev(R,e)), F = P.map(c.F);
+      if(c.type==='impl0'){ const r = h.map((v,j)=>v/F[j]); return isFinite(r[0]) && Math.abs(r[0])>1e-9 && r.every(v=>near(v,r[0])); }
+      const d = h.slice(1).map(v=>v-h[0]), D = F.slice(1).map(v=>v-F[0]);
+      const lam = d[0]/D[0];
+      return isFinite(lam) && Math.abs(lam)>1e-9 && d.every((v,j)=>near(v, lam*D[j]));
+    }
+    ev(L,{x:1,y:1,t:1,c:0,k:0}); ev(R,{x:1,y:1,t:1,c:0,k:0});
+    return false;
+  }catch(err){ return null; }
+}
+
+function canon(s){
+  const n = normalize(s).replace(/(\([^()]*\))\^2/g,'$1$1');
+  return (n.match(/\([^()]*\)|[^()]+/g) || []).sort().join('|');
+}
+
+function checkAnswer(){
+  const ex = exercises[state.idx];
+  const raw = document.getElementById('answerInput').value.trim();
+  if(!raw) return;
+  const norm = normalize(raw);
+  const verdict = isCorrect(ex, raw);
+  if(verdict === null){
+    const f = document.getElementById('feedbackBox');
+    f.className = 'feedback show bad';
+    f.textContent = 'No pude interpretar tu expresión. Revisa paréntesis, usa ^ para potencias, e^(...) para la exponencial y una sola igualdad.';
+    return;
+  }
+  const correct = verdict;
+
+  const fb = document.getElementById('feedbackBox');
+  fb.className = 'feedback show ' + (correct ? 'ok' : 'bad');
+  fb.textContent = correct
+    ? '✓ ¡Correcto! Tu solución es equivalente a la esperada.'
+    : `✗ No es correcto todavía. La solución esperada es: ${ex.display}. Revisa la explicación abajo.`;
+
+  const exp = document.getElementById('explanationBox');
+  exp.className = 'explanation show';
+  exp.innerHTML = `<b>Explicación:</b> ${ex.explanation}<br><br><i><b>Explanation:</b> ${EN[state.idx].e}</i>`;
+
+  document.getElementById('postCheckAudios').style.display = 'flex';
+  document.getElementById('nextBtn').style.display = 'inline-block';
+  document.getElementById('checkBtn').disabled = true;
+  document.getElementById('hintBtn').disabled = true;
+  document.getElementById('answerInput').disabled = true;
+
+  renderExerciseCrates(ex, true);
+
+  state.results.push({
+    tag: ex.tag,
+    statement: ex.statement,
+    studentAnswer: raw,
+    correctAnswer: ex.display,
+    correct: correct,
+    context: ex.context,
+    explanation: ex.explanation,
+    enExplanation: EN[state.idx].e,
+    hints: state.hints
+  });
+}
+
+/* ---------------------------------------------------------
+   RENDER DE CADA EJERCICIO
+--------------------------------------------------------- */
+function renderExercise(){
+  const ex = exercises[state.idx];
+  document.getElementById('exTag').textContent = `EJERCICIO ${state.idx+1} DE ${exercises.length} · ${ex.tag}`;
+  document.getElementById('exContext').textContent = ex.context;
+  document.getElementById('exStatement').textContent = ex.statement;
+  document.getElementById('answerInput').value = '';
+  document.getElementById('answerInput').disabled = false;
+  document.getElementById('checkBtn').disabled = false;
+  document.getElementById('feedbackBox').className = 'feedback';
+  document.getElementById('explanationBox').className = 'explanation';
+  document.getElementById('postCheckAudios').style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'none';
+  document.getElementById('progressFill').style.width = `${(state.idx/exercises.length)*100}%`;
+  renderExerciseCrates(ex, false);
+  updateBadge();
+
+  const en = EN[state.idx];
+  const $ = id => document.getElementById(id);
+  $('audioStatement').onclick   = () => speak(`${toSpeech(ex.context,'es')} Enunciado: ${ex.sayES}`,'es-ES');
+  $('audioStatementEN').onclick = () => speak(`${toSpeech(en.c,'en')} Statement: ${ex.sayEN}`,'en-US');
+  $('audioExplain').onclick     = () => speak(toSpeech(ex.explanation,'es'),'es-ES');
+  $('audioExplainEN').onclick   = () => speak(toSpeech(en.e,'en'),'en-US');
+  $('audioCorrect').onclick     = () => speak(`La respuesta correcta es: ${ex.solES}`,'es-ES');
+  $('audioCorrectEN').onclick   = () => speak(`The correct answer is: ${ex.solEN}`,'en-US');
+  $('audioMyAnswer').onclick = () => {
+    const v = $('answerInput').value.trim();
+    speak(v ? `Tu respuesta es: ${toSpeech(v,'es',true)}` : 'Todavía no has escrito ninguna respuesta.','es-ES');
+  };
+  $('audioMyAnswerEN').onclick = () => {
+    const v = $('answerInput').value.trim();
+    speak(v ? `Your answer is: ${toSpeech(v,'en',true)}` : 'You have not written an answer yet.','en-US');
+  };
+
+  const g = GUIDE[ex.method];
+  $('guideMethod').textContent = g.name;
+  $('guideList').innerHTML = g.es.map((t,k) => `<li>${t}<span>${g.en[k]}</span></li>`).join('');
+  state.hints = 0;
+  $('hintList').innerHTML = '';
+  const hb = $('hintBtn');
+  hb.disabled = false; hb.textContent = '💡 Ver pista (0/3)';
+  hb.onclick = () => {
+    if(state.hints >= 3) return;
+    const k = state.hints++;
+    $('hintList').insertAdjacentHTML('beforeend', `<div class="hint">💡 <b>Pista ${k+1}:</b> ${ex.hints[k]}<i><b>Hint ${k+1}:</b> ${ex.hintsEN[k]}</i></div>`);
+    hb.textContent = `💡 Ver pista (${state.hints}/3)`;
+    if(state.hints >= 3) hb.disabled = true;
+  };
+  $('guideAudio').onclick   = () => speak('Instrucciones. ' + g.es.map((t,k) => `Paso ${k+1}: ${toSpeech(t,'es')}`).join(' '),'es-ES');
+  $('guideAudioEN').onclick = () => speak('Instructions. ' + g.en.map((t,k) => `Step ${k+1}: ${toSpeech(t,'en')}`).join(' '),'en-US');
+  $('hintAudio').onclick   = () => speak(state.hints ? `Pista ${state.hints}: ${toSpeech(ex.hints[state.hints-1],'es')}` : 'Primero pulsa el botón Ver pista.','es-ES');
+  $('hintAudioEN').onclick = () => speak(state.hints ? `Hint ${state.hints}: ${toSpeech(ex.hintsEN[state.hints-1],'en')}` : 'First press the Show hint button.','en-US');
+
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ---------------------------------------------------------
+   RESUMEN FINAL
+--------------------------------------------------------- */
+function renderSummary(){
+  const list = document.getElementById('summaryList');
+  const correctCount = state.results.filter(r => r.correct).length;
+  document.getElementById('scoreNum').textContent = `${correctCount}/${exercises.length}`;
+  list.innerHTML = state.results.map((r,i) => `
+    <div class="summary-item">
+      <div class="summary-head">
+        <span>${i+1}. ${r.tag} — ${r.statement}</span>
+        <span class="mark ${r.correct ? 'ok' : 'bad'}">${r.correct ? 'CORRECTO' : 'REVISAR'}</span>
+      </div>
+      <div style="font-size:12.5px;color:var(--muted);margin-top:6px;">
+        Tu respuesta: <span class="mono">${esc(r.studentAnswer)}</span> &nbsp;·&nbsp;
+        Esperada: <span class="mono">${r.correctAnswer}</span> &nbsp;·&nbsp; Pistas: ${r.hints}/3
+      </div>
+    </div>
+  `).join('');
+  updateBadge();
+}
+
+/* ---------------------------------------------------------
+   GENERACIÓN DE PDF
+--------------------------------------------------------- */
+function pdfSafe(t){ return String(t).replace(/−/g,'-').replace(/[′]/g,"'").replace(/√/g,'sqrt').replace(/[⇒→]/g,'->').replace(/[✓✗]/g,''); }
+function downloadBlob(blob, name){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function safeName(){ return (state.name || 'estudiante').trim().replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ ]/g,'').replace(/\s+/g,'_'); }
+const COVER = [['DOCENTE','NICOLAS BILBAO'],['MATERIA','ECUACIONES DIFERENCIALES'],['SEMANA','2'],['PROGRAMA','INGENIERÍA EN SEGURIDAD Y SALUD EN EL TRABAJO']];
+function dateStr(){ return new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'}); }
+
+function generatePDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'a4' });
+  const mx = 48, W = 499; let y = 56;
+  const write = (t, o={}) => {
+    doc.setFont('helvetica', o.b ? 'bold' : (o.i ? 'italic' : 'normal'));
+    doc.setFontSize(o.s || 10.5);
+    doc.setTextColor(...(o.c || [30,30,30]));
+    doc.splitTextToSize(pdfSafe(t), W - (o.ind||0)).forEach(l => {
+      if(y > 790){ doc.addPage(); y = 56; }
+      doc.text(l, mx + (o.ind||0), y); y += (o.lh || 14);
+    });
+  };
+  const correctCount = state.results.filter(r => r.correct).length;
+
+  // Portada
+  doc.setFillColor(11,35,64); doc.rect(0,0,595,842,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(26); doc.setTextColor(255,199,44);
+  doc.text('UNIVERSIDAD AMERICANA', mx, 150);
+  doc.setFontSize(15); doc.setTextColor(237,241,230);
+  doc.text('Ecuaciones diferenciales · Unidad 1 · Actividad 2', mx, 185);
+  let cy = 250;
+  COVER.forEach(([k,v]) => {
+    doc.setFontSize(10); doc.setTextColor(142,203,255); doc.text(k, mx, cy);
+    doc.setFontSize(13); doc.setTextColor(237,241,230);
+    doc.splitTextToSize(v, W).forEach((l,i) => doc.text(l, mx, cy + 16 + i*16));
+    cy += 62;
+  });
+  doc.setDrawColor(255,199,44); doc.line(mx, cy, mx+W, cy); cy += 30;
+  doc.setFontSize(10); doc.setTextColor(142,203,255); doc.text('ESTUDIANTE', mx, cy);
+  doc.setFontSize(14); doc.setTextColor(255,255,255); doc.text(pdfSafe(state.name), mx, cy+18);
+  doc.setFontSize(11); doc.text(`Fecha: ${dateStr()}`, mx, cy+42);
+  doc.text(`Puntaje: ${correctCount} de ${exercises.length} ejercicios correctos`, mx, cy+60);
+
+  // Preguntas y respuestas
+  doc.addPage(); y = 56;
+  state.results.forEach((r,i) => {
+    if(y > 640){ doc.addPage(); y = 56; }
+    write(`${i+1}. ${r.tag}`, {b:true, s:12, lh:17});
+    write(r.context, {ind:8});
+    write(`Expresión: ${r.statement}`, {b:true, ind:8});
+    write(`Respuesta del estudiante: ${r.studentAnswer}`, {ind:8});
+    write(`Respuesta correcta: ${r.correctAnswer}`, {ind:8});
+    write(r.correct ? 'Resultado: CORRECTO' : 'Resultado: PARA REVISAR', {b:true, ind:8, c: r.correct ? [30,130,80] : [200,60,40]});
+    write(`Pistas usadas: ${r.hints} de 3`, {ind:8});
+    write(`Explicación: ${r.explanation}`, {ind:8, c:[70,70,70], s:9.5});
+    write(`Explanation: ${r.enExplanation}`, {ind:8, i:true, c:[70,70,70], s:9.5});
+    y += 14;
+  });
+  doc.save(`EDO_${safeName()}.pdf`);
+}
+
+function generateHTML(){
+  const correctCount = state.results.filter(r => r.correct).length;
+  const items = state.results.map((r,i) => `
+  <section class="q ${r.correct?'ok':'bad'}">
+    <h3>${i+1}. ${esc(r.tag)}</h3>
+    <p>${esc(r.context)}</p>
+    <p class="expr">Expresión: ${esc(r.statement)}</p>
+    <p>Respuesta del estudiante: <code>${esc(r.studentAnswer)}</code></p>
+    <p>Respuesta correcta: <code>${esc(r.correctAnswer)}</code></p>
+    <p class="res">${r.correct ? '✓ CORRECTO' : '✗ PARA REVISAR'} · Pistas usadas: ${r.hints}/3</p>
+    <p class="exp"><b>Explicación:</b> ${esc(r.explanation)}<br><i><b>Explanation:</b> ${esc(r.enExplanation)}</i></p>
+  </section>`).join('');
+  const cover = COVER.map(([k,v]) => `<div><span>${k}</span><b>${esc(v)}</b></div>`).join('');
+  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resultados · ${esc(state.name)}</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:860px;margin:0 auto;padding:24px;color:#1b2a3d;background:#f5f7fa}
+header{background:#0b2340;color:#edf1e6;padding:28px;border-radius:6px;margin-bottom:22px}
+header h1{color:#ffc72c;margin:0 0 14px}
+header div{display:inline-block;min-width:210px;margin:6px 18px 6px 0}
+header span{display:block;font-size:11px;color:#8ecbff;letter-spacing:.1em}
+.score{font-size:18px;margin-top:14px}
+.q{background:#fff;border-left:5px solid #5ac98f;padding:12px 18px;margin-bottom:14px;border-radius:3px;break-inside:avoid}
+.q.bad{border-color:#ff6b4a}.q h3{margin:0 0 8px}.expr{font-weight:bold}
+code{background:#eef1f5;padding:2px 6px;border-radius:3px}.res{font-weight:bold}.exp{font-size:13px;color:#445}
+@media print{body{background:#fff}header{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body>
+<header><h1>UNIVERSIDAD AMERICANA</h1><p>Ecuaciones diferenciales · Unidad 1 · Actividad 2</p>${cover}
+<div class="score"><b>Estudiante:</b> ${esc(state.name)}<br><b>Fecha:</b> ${dateStr()}<br><b>Puntaje:</b> ${correctCount} de ${exercises.length}</div></header>
+${items}</body></html>`;
+  downloadBlob(new Blob([html], {type:'text/html;charset=utf-8'}), `EDO_${safeName()}.html`);
+}
+
+/* ---------------------------------------------------------
+   EVENTOS
+--------------------------------------------------------- */
+document.getElementById('startBtn').addEventListener('click', () => {
+  const nameInput = document.getElementById('studentName');
+  const name = nameInput.value.trim();
+  if(!name){
+    nameInput.style.borderColor = 'var(--red)';
+    nameInput.focus();
+    return;
+  }
+  state.name = name;
+  greet(name);
+  document.getElementById('tbName').textContent = name;
+  document.getElementById('tbDate').textContent = new Date().toLocaleDateString('es-CO');
+  renderFactorTree();
+  showScreen('screen-intro');
+});
+
+document.getElementById('audioIntro').addEventListener('click', () => speak(INTRO_ES,'es-ES'));
+document.getElementById('audioIntroEN').addEventListener('click', () => speak(INTRO_EN,'en-US'));
+
+const nameEl = document.getElementById('studentName');
+nameEl.addEventListener('change', () => { const n = nameEl.value.trim(); if(n.length >= 2) greet(n); });
+nameEl.addEventListener('keydown', e => { if(e.key === 'Enter') document.getElementById('startBtn').click(); });
+
+document.getElementById('toExercises').addEventListener('click', () => {
+  state.idx = 0;
+  showScreen('screen-exercise');
+  renderExercise();
+});
+
+document.getElementById('checkBtn').addEventListener('click', checkAnswer);
+
+document.querySelectorAll('.btn-chip[data-insert]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const input = document.getElementById('answerInput');
+    if(input.disabled) return;
+    insertAtCursor(input, btn.getAttribute('data-insert'));
+  });
+});
+
+document.getElementById('answerInput').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && !document.getElementById('checkBtn').disabled) checkAnswer();
+});
+
+document.getElementById('nextBtn').addEventListener('click', () => {
+  state.idx++;
+  if(state.idx >= exercises.length){
+    showScreen('screen-summary');
+    renderSummary();
+    document.getElementById('autoMsg').textContent = 'Se están generando automáticamente tu PDF y tu HTML con todas las preguntas y respuestas. Si tu navegador los bloquea, usa los botones.';
+    setTimeout(() => { generatePDF(); setTimeout(generateHTML, 900); }, 500);
+  } else {
+    renderExercise();
+  }
+});
+
+document.getElementById('pdfBtn').addEventListener('click', generatePDF);
+document.getElementById('htmlBtn').addEventListener('click', generateHTML);
+
+if('speechSynthesis' in window){
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+</script>
+</body>
+</html>
